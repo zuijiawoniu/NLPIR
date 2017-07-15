@@ -44,7 +44,7 @@
 #define FIELD_TYPE_FLOAT 5
 #define DATA_TYPE_BIGTEXT 6
 #define FIELD_TYPE_NAME 8
-JZSearchAPI_API int JZIndexer_FieldAdd(const char *sFieldName,const char *sDBFieldName,int nFieldType,bool bIndexed,bool bRetrieved,bool bGeneral=false,bool bAbstracted=false);
+JZSearchAPI_API int JZIndexer_FieldAdd(const char *sFieldName,const char *sDBFieldName,int nFieldType,bool bIndexed,bool bRetrieved);
 //字段名称	索引名称	数据类型	是否需要索引	是否需要过滤用	是否需要存储	是否为通配符检索域	解释
 //sFieldName:域名称，在索引建立与搜索过程中，域的唯一标示符
 //sDBFieldName：对应于数据库的字段名称；在数据库搜索的时候，用于获取数据库的数据
@@ -55,8 +55,6 @@ JZSearchAPI_API int JZIndexer_FieldAdd(const char *sFieldName,const char *sDBFie
 	//FIELD_TYPE_DATETIME
 //bIndexed:是否需要索引
 //bRetrieved:搜索结果中是否要输出该字段内容
-//bGeneral:是否纳入通配搜索的范畴
-//bAbstract:是否进行搜索摘要提取并红显
 
 
 JZSearchAPI_API int JZIndexer_FieldSave(const char *sFieldInfoDataFile);
@@ -91,6 +89,15 @@ JZSearchAPI_API int JZIndexer_Init(const char *sDictPath=0,const char *sFieldInf
 //索引系统初始化，必须初始化后，才能使用CJZIndexer
 //sDictPath：词典文件名；为空时，采用n-gram索引方法
 //sFieldInfoFile:域字段信息，用于支持多域索引，为空则只支持一个字段
+
+#define JZINDEX_STATUS_NORMAL 0//正常状态
+#define JZINDEX_STATUS_PROCESSING 1//正在索引过程中，不能再索引
+#define JZINDEX_STATUS_MERGE 2//正在归并过程中，不能再索引
+#define JZINDEX_STATUS_RELOAD 3//正在重新加载过程中，不能再索引
+#define JZINDEX_STATUS_UPDATED 4//最新的索引数据，检索服务还没有更新过来
+#define JZINDEX_STATUS_BACKUP 5//backup status,added in 2013/8/15
+JZSearchAPI_API int JZIndexer_SetStatus(int nStatus);
+//设置系统索引的状态锁，便于后续的操控
 
 JZSearchAPI_API int JZIndexer_Exit();
 //系统退出
@@ -194,6 +201,31 @@ JZSearchAPI_API const char * JZSearch_ReloadBlackList(void);
 JZSearchAPI_API const char * JZSearch_ReloadQueryExpand(void);
 //搜索扩展词更新后，重新加载
 
+JZSearchAPI_API size_t JZSearch_AddSimDict(const char *sLine);
+//从内存中，增加同义词
+//格式  w1 w1a w1b##w2 w2a w2b##w3 w3a w3b
+//如： 土豆 马铃薯##西红柿 番茄
+/*********************************************************************
+*
+*  Func Name  : JZSearch_CleanQueryExpand
+*
+*  Description: Clean QueryExpand dictionary
+*
+*  Parameters : none
+*
+*  Returns    : prompt message
+*
+*  Author    :    NLPIR.org
+*  History    :
+*              1.create 9:9:2016
+*********************************************************************/
+JZSearchAPI_API bool JZSearch_CleanQueryExpand(void);
+
+JZSearchAPI_API size_t JZSearch_AddSimDictFile(const char *sSimDictFile, const char *sAssociateDictFile);
+//从同义词表文件和扩展词表中增加同义词，重新加载
+//格式  w1 w1a w1b##w2 w2a w2b##w3 w3a w3b
+//如： 土豆 马铃薯##西红柿 番茄
+
 JZSearchAPI_API int JZSearch_ListFieldAllValue(const char *sFieldLine,const char *sExportFile,bool bDuplicateErase=false,SEARCHER_HANDLE handle=1);
 //列出指定字段索引的内容
 
@@ -207,7 +239,7 @@ JZSearchAPI_API int JZSearch_ExportTerm(int nTermID,const char *sExportFile,SEAR
 //导出内部的数据，以便核查
 
 JZSearchAPI_API int JZSearch_Merge(SEARCHER_HANDLE handle=0);
-//系统自动优化，对索引信息进行归并处理
+//系统自动优化，
 
 JZSearchAPI_API int JZSearch_Backup(const char *sFilename=0,SEARCHER_HANDLE handle=0);
 //系统索引数据自动备份，一般不建议用户自行使用，系统会自动备份
@@ -238,6 +270,7 @@ public:
 	//nPageCount=-1:当前页需要返回所有的结果数目
 	//sResultName：结果存储的XML地址
 	//bMemUsed:false,结果保持到文件中，文件名由sResultName指定；否则，sResultName为内存起始地址
+
 	const RESULT_RECORD_VECTOR Search(const char *query_line,int *p_nResultCountRet,bool bNoSort=false,RESULT_RECORD_VECTOR pVecFKs=0,int nFKCount=0,const char *sFKFieldName=0);
 	//query_line: 查询表达式
 	//p_nResultCountRet:搜索结果总数
@@ -346,6 +379,13 @@ JZSearchAPI_API int JZSearch_SetIndexSizeLimit(int nLimitSize=20480);
 JZSearchAPI_API int JZSearch_SetUniqeCountLimit(int nLimitSize=100);//added in 2015/6/10
 //设置Unique操作的最大去重输出个数，一般设置为100；过多导致效率低下
 //nLimitSize<0：不限制，全部去重
+
+JZSearchAPI_API int JZSearch_SetHighlightFull(int nTrue=1);//added in 2016/10/22
+//设置高亮显示是否必须只显示完整字符串，如搜索“避雷针”，不能红显 "避雷"
+//True或者1： 只显示完整字符串
+//False: 可以显示子串
+
 JZSearchAPI_API int JZSearch_DocDelete(JZSEARCH_HANDLE handle,int doc_id);//删除handle搜索引擎中的内部编号为doc_id的文档
+JZSearchAPI_API const char * JZSearch_GetLastErrorMsg();//删除handle搜索引擎中的内部编号为doc_id的文档
 
 #endif

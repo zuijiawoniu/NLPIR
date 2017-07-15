@@ -237,20 +237,7 @@ NLPIR_API double NLPIR_FileProcess(const char *sSourceFilename,const char *sResu
  *  History    : 
  *              1.create 2014-8-3
  *********************************************************************/
-NLPIR_API unsigned int NLPIR_ImportUserDict(const char *sFilename,bool bOverwrite=true);
-
-/*********************************************************************
- *
- *  Func Name  : NLPIR_ImportKeyBlackList
- *
- *  Description: Import keyword black list 
- *  Parameters : Text filename for user dictionary, each line for a stop keyword
- *  Returns    : The  number of  lexical entry imported successfully
- *  Author     : Kevin Zhang
- *  History    : 
- *              1.create 2014-6-26
- *********************************************************************/
-NLPIR_API unsigned int NLPIR_ImportKeyBlackList(const char *sFilename);
+NLPIR_API unsigned int NLPIR_ImportUserDict(const char *sFilename,bool bOverwrite=false);
 /*********************************************************************
 *
 *  Func Name  : NLPIR_AddUserWord
@@ -266,8 +253,22 @@ NLPIR_API unsigned int NLPIR_ImportKeyBlackList(const char *sFilename);
 *  History    : 
 *              1.create 11:10:2008
 *********************************************************************/
-NLPIR_API int NLPIR_AddUserWord(const char *sWord);//add by qp 2008.11.10
-
+NLPIR_API int NLPIR_AddUserWord(const char *sWord);
+/*********************************************************************
+*
+*  Func Name  : NLPIR_CleanUserWord
+*
+*  Description: Clean all temporary added user words
+*
+*  Parameters : sFilename: file name
+*
+*  Returns    : 1,true ; 0,false
+*
+*  Author     :
+*  History    :
+*              1.create 2017/2/26
+*********************************************************************/
+NLPIR_API int NLPIR_CleanUserWord();
 /*********************************************************************
 *
 *  Func Name  : Save
@@ -322,13 +323,26 @@ NLPIR_API double NLPIR_GetUniProb(const char *sWord);
 *    
 *
 *  Parameters : sWord: input word 
-*  Returns    : success: 
-*               fail: 
+*  Returns    :1: exists; 0: no exists
 *  Author     : Kevin Zhang  
 *  History    : 
 *              1.create 2005-11-22
 *********************************************************************/
 NLPIR_API int NLPIR_IsWord(const char *sWord);
+/*********************************************************************
+*
+*  Func Name  : NLPIR_IsUserWord
+*
+*  Description: Judge whether the word is included in the user-defined dictionary
+*
+*
+*  Parameters : sWord: input word
+*  Returns    :1: exists; 0: no exists
+*  Author     : Kevin Zhang
+*  History    :
+*              1.create 2016-12-31
+*********************************************************************/
+NLPIR_API int NLPIR_IsUserWord(const char *sWord);
 
 /*********************************************************************
 *
@@ -342,101 +356,11 @@ NLPIR_API int NLPIR_IsWord(const char *sWord);
 *  Returns    : success: 
 *               fail: 
 *  Author     : Kevin Zhang  
-*  History    : 
+*  History    :  
 *              1.create 2014-10-10
 *********************************************************************/
 NLPIR_API const char * NLPIR_GetWordPOS(const char *sWord);
 
-/*********************************************************************
-*
-*  Func Name  : NLPIR_GetKeyWords
-*
-*  Description: Extract keyword from sLine
-*
-*  Parameters : sLine, the input paragraph 
-				bArguOut,whether  the keyword weight output
-				nMaxKeyLimt:maximum of key words, up to 50
-*  Returns    : keywords list like:
-*               "科学发展观 宏观经济 " or
-				"科学发展观/23.80/12#宏观经济/12.20/1" with weight(信息熵加上词频信息)
-*
-*  Author     :   
-*  History    : 
-*              1.create 2012/11/12
-*********************************************************************/
-NLPIR_API const char * NLPIR_GetKeyWords(const char *sLine,int nMaxKeyLimit=50,bool bWeightOut=false);
-
-/*********************************************************************
-*
-*  Func Name  : NLPIR_GetFileKeyWords
-*
-*  Description: Extract keyword from a text file
-*
-*  Parameters : sFilename, the input text file name 
-				bArguOut,whether  the keyword weight output
-				nMaxKeyLimt:maximum of key words, up to 50
-*  Returns    : keywords list like:
-*               "科学发展观 宏观经济 " or
-				"科学发展观 23.80 宏观经济 12.20" with weight
-
-*
-*  Author     :   
-*  History    : 
-*              1.create 2012/11/12
-*********************************************************************/
-NLPIR_API const char * NLPIR_GetFileKeyWords(const char *sFilename,int nMaxKeyLimit=50,bool bWeightOut=false);
-/*********************************************************************
-*
-*  Func Name  : NLPIR_GetNewWords
-*
-*  Description: Extract New words from sLine
-*
-*  Parameters : sLine, the input paragraph 
-				bArguOut,whether  the keyword weight output
-				nMaxKeyLimt:maximum of key words, up to 50
-*  Returns    : new words list like:
-*               "科学发展观 屌丝 "or
-				"科学发展观 23.80 屌丝 12.20" with weight
-*
-*  Author     :   
-*  History    : 
-*              1.create  2012/11/12
-*********************************************************************/
-NLPIR_API const char * NLPIR_GetNewWords(const char *sLine,int nMaxKeyLimit=50,bool bWeightOut=false);
-
-/*********************************************************************
-*
-*  Func Name  : NLPIR_GetFileNewWords
-*
-*  Description: Extract new words from a text file
-*
-*  Parameters : sFilename, the input text file name 
-				bArguOut,whether  the keyword weight output
-				nMaxKeyLimt:maximum of key words, up to 50
-*  Returns    : keywords list like:
-*               "科学发展观 宏观经济 " or
-				"科学发展观 23.80 宏观经济 12.20" with weight
-
-*
-*  Author     :   
-*  History    : 
-*              1.create 2012/11/12
-*********************************************************************/
-NLPIR_API const char * NLPIR_GetFileNewWords(const char *sFilename,int nMaxKeyLimit=50,bool bWeightOut=false);
-/*********************************************************************
-*
-*  Func Name  : NLPIR_FingerPrint
-*
-*  Description: Extract a finger print from the paragraph
-*
-*  Parameters :
-*  Returns    : 0, failed; else, the finger print of the content
-*
-*  Author     :   
-*  History    : 
-*              1.create 11:10:2008
-*********************************************************************/
-NLPIR_API unsigned long NLPIR_FingerPrint(const char *sLine);
 
 /*********************************************************************
 *
@@ -457,171 +381,6 @@ NLPIR_API unsigned long NLPIR_FingerPrint(const char *sLine);
 NLPIR_API int NLPIR_SetPOSmap(int nPOSmap);
 
 
-/*********************************************************************
-*
-*  class CNLPIR
-*   描述：
-*		   NLPIR 类，使用之前必须调用NLPIR_Init(),退出必须调用NLPIR_Exit
-*		   在使用过程中可以使用多份CNLPIR，支持多线程分词处理
-*			每个线程先调用GetActiveInstance，获取处理类，然后，设置SetAvailable(false)宣示线程主权，
-*			处理完成后，SetAvailable(true)释放线程主权
-*  History    : 
-*              1.create 2005-11-10
-*********************************************************************/
-#ifdef OS_LINUX
-class  CNLPIR {
-#else
-class  __declspec(dllexport) CNLPIR {
-#endif
-	public:
-		CNLPIR();
-		~CNLPIR();
-		double FileProcess(const char *sSourceFilename,const char *sResultFilename,int bPOStagged=1);
-		//Process a file，类似于C下的NLPIR_FileProcess
-		const char * ParagraphProcess(const char *sLine,int bPOStagged=1); 
-		//Process a file，类似于C下的NLPIR_ParagraphProcess
-		const result_t * ParagraphProcessA(const char *sParagraph,int *pResultCount,bool bUserDict=true);
-		//Process a file，类似于C下的NLPIR_ParagraphProcessA
-
-		void ParagraphProcessAW(int nCount,result_t * result);
-		int GetParagraphProcessAWordCount(const char *sParagraph);
-
-		const char * GetKeyWords(const char *sLine,int nMaxKeyLimit,bool bWeightOut);
-		//获取关键词
-		const char * GetFileKeyWords(const char *sFilename,int nMaxKeyLimit,bool bWeightOut);
-		//从文本文件中获取关键词
-		const char * GetNewWords(const char *sFilename,int nMaxKeyLimit,bool bWeightOut);
-		//获取新词
-		const char * GetFileNewWords(const char *sFilename,int nMaxKeyLimit,bool bWeightOut);
-		//从文本文件中获取新词
-
-		bool SetAvailable(bool bAvailable=true);//当前线程释放该类，可为下一个线程使用
-		bool IsAvailable();//判断当前分词器是否被线程占用
-		unsigned int GetHandle()
-		{
-			return m_nHandle;
-		}
-private:
-		unsigned int m_nHandle;//该成员作为该类的Handle值，由系统自动分配，用户不可修改
-		bool m_bAvailable;//该成员作为多线程共享控制的参数，由系统自动分配，用户不可修改
-		int m_nThreadCount;//Thread Count
-		bool m_bWriting;//writing  protection
-};
-
-/*********************************************************************
-*
-*  Func Name  : GetActiveInstance
-*
-*  Description: 获取可用的CNLPIR类，适用于多线程开发，先获取可用的CNLP，再调用其中的功能
-
-*
-*  Parameters : None
-*  Returns    : CNLPIR*
-*
-*  Author     : Kevin Zhang
-*  History    : 
-*              1.create 1:10:2012
-*********************************************************************/
-NLPIR_API CNLPIR* GetActiveInstance();
-
-/*********************************************************************
-*
-*  以下函数为2013版本专门针对新词发现的过程，一般建议脱机实现，不宜在线处理
-*  新词识别完成后，再自动导入到分词系统中，即可完成
-*  函数以NLPIR_NWI(New Word Identification)开头
-*********************************************************************/
-/*********************************************************************
-*
-*  Func Name  : NLPIR_NWI_Start
-*
-*  Description: 启动新词识别
-
-*
-*  Parameters : None
-*  Returns    : bool, true:success, false:fail
-*
-*  Author     : Kevin Zhang
-*  History    : 
-*              1.create 2013/11/23
-*********************************************************************/
-NLPIR_API int NLPIR_NWI_Start();//New Word Indentification Start
-/*********************************************************************
-*
-*  Func Name  : NLPIR_NWI_AddFile
-*
-*  Description: 往新词识别系统中添加待识别新词的文本文件
-*				需要在运行NLPIR_NWI_Start()之后，才有效
-*
-*  Parameters : const char *sFilename：文件名
-*  Returns    : bool, true:success, false:fail
-*
-*  Author     : Kevin Zhang
-*  History    : 
-*              1.create 20132/11/23
-*********************************************************************/
-NLPIR_API int  NLPIR_NWI_AddFile(const char *sFilename);
-/*********************************************************************
-*
-*  Func Name  : NLPIR_NWI_AddMem
-*
-*  Description: 往新词识别系统中添加一段待识别新词的内存
-*				需要在运行NLPIR_NWI_Start()之后，才有效
-*
-*  Parameters : const char *sFilename：文件名
-*  Returns    : bool, true:success, false:fail
-*
-*  Author     : Kevin Zhang
-*  History    : 
-*              1.create 2013/11/23
-*********************************************************************/
-NLPIR_API int NLPIR_NWI_AddMem(const char *sText);
-/*********************************************************************
-*
-*  Func Name  : NLPIR_NWI_Complete
-*
-*  Description: 新词识别添加内容结束
-*				需要在运行NLPIR_NWI_Start()之后，才有效
-*
-*  Parameters : None
-*  Returns    : bool, true:success, false:fail
-*
-*  Author     : Kevin Zhang
-*  History    : 
-*              1.create 2013/11/23
-*********************************************************************/
-NLPIR_API int NLPIR_NWI_Complete();//新词
-/*********************************************************************
-*
-*  Func Name  : NLPIR_NWI_GetResult
-*
-*  Description: 获取新词识别的结果
-*				需要在运行NLPIR_NWI_Complete()之后，才有效
-*
-*  Parameters : bWeightOut：是否需要输出每个新词的权重参数
-*
-*  Returns    : 输出格式为
-*				【新词1】 【权重1】 【新词2】 【权重2】 ... 
-*
-*  Author     : Kevin Zhang
-*  History    : 
-*              1.create 2013/11/23
-*********************************************************************/
-NLPIR_API const char * NLPIR_NWI_GetResult(bool bWeightOut=false);//输出新词识别结果
-/*********************************************************************
-*
-*  Func Name  : NLPIR_NWI_Result2UserDict
-*
-*  Description: 将新词识别结果导入到用户词典中
-*				需要在运行NLPIR_NWI_Complete()之后，才有效
-*				如果需要将新词结果永久保存，建议在执行NLPIR_SaveTheUsrDic
-*  Parameters : None
-*  Returns    : bool, true:success, false:fail
-*
-*  Author     : Kevin Zhang
-*  History    : 
-*              1.create 2013/11/23
-*********************************************************************/
-NLPIR_API unsigned int  NLPIR_NWI_Result2UserDict();//新词识别结果转为用户词典,返回新词结果数目
 /*********************************************************************
 *
 *  Func Name  : NLPIR_FinerSegment(const char *sLine)
@@ -678,4 +437,302 @@ NLPIR_API const char*  NLPIR_WordFreqStat(const char *sText);
 *********************************************************************/
 NLPIR_API const char*  NLPIR_FileWordFreqStat(const char *sFilename);
 
+/*********************************************************************
+*
+*  class CNLPIR
+*   描述：
+*		   NLPIR 类，使用之前必须调用NLPIR_Init(),退出必须调用NLPIR_Exit
+*		   在使用过程中可以使用多份CNLPIR，支持多线程分词处理
+*			每个线程先调用GetActiveInstance，获取处理类，然后，设置SetAvailable(false)宣示线程主权，
+*			处理完成后，SetAvailable(true)释放线程主权
+*  History    : 
+*              1.create 2005-11-10
+*********************************************************************/
+#ifdef OS_LINUX
+class  CNLPIR {
+#else
+class  __declspec(dllexport) CNLPIR {
+#endif
+	public:
+		CNLPIR();
+		~CNLPIR();
+		double FileProcess(const char *sSourceFilename,const char *sResultFilename,int bPOStagged=1);
+		//Process a file，类似于C下的NLPIR_FileProcess
+		const char * ParagraphProcess(const char *sLine,int bPOStagged=1); 
+		//Process a file，类似于C下的NLPIR_ParagraphProcess
+		const result_t * ParagraphProcessA(const char *sParagraph,int *pResultCount,bool bUserDict=true);
+		//Process a file，类似于C下的NLPIR_ParagraphProcessA
+
+		void ParagraphProcessAW(int nCount,result_t * result);
+		int GetParagraphProcessAWordCount(const char *sParagraph);
+
+		bool SetAvailable(bool bAvailable=true);//当前线程释放该类，可为下一个线程使用
+		bool IsAvailable();//判断当前分词器是否被线程占用
+		unsigned int GetHandle()
+		{
+			return m_nHandle;
+		}
+
+#ifdef  NLPIR_KEY_NEW_FUNC//Include keyword and new word function
+		const char * GetKeyWords(const char *sLine,int nMaxKeyLimit,bool bWeightOut);
+		//获取关键词
+		const char * GetFileKeyWords(const char *sFilename,int nMaxKeyLimit,bool bWeightOut);
+		//从文本文件中获取关键词
+		const char * GetNewWords(const char *sFilename,int nMaxKeyLimit,bool bWeightOut);
+		//获取新词
+		const char * GetFileNewWords(const char *sFilename,int nMaxKeyLimit,bool bWeightOut);
+		//从文本文件中获取新词
+#endif
+private:
+		unsigned int m_nHandle;//该成员作为该类的Handle值，由系统自动分配，用户不可修改
+		bool m_bAvailable;//该成员作为多线程共享控制的参数，由系统自动分配，用户不可修改
+		int m_nThreadCount;//Thread Count
+		bool m_bWriting;//writing  protection
+};
+
+/*********************************************************************
+*
+*  Func Name  : GetActiveInstance
+*
+*  Description: 获取可用的CNLPIR类，适用于多线程开发，先获取可用的CNLP，再调用其中的功能
+
+*
+*  Parameters : None
+*  Returns    : CNLPIR*
+*
+*  Author     : Kevin Zhang
+*  History    : 
+*              1.create 1:10:2012
+*********************************************************************/
+NLPIR_API CNLPIR* GetActiveInstance();
+/*********************************************************************
+*
+*  Func Name  : NLPIR_FingerPrint
+*
+*  Description: Extract a finger print from the paragraph
+*
+*  Parameters :
+*  Returns    : 0, failed; else, the finger print of the content
+*
+*  Author     :   
+*  History    : 
+*              1.create 11:10:2008
+*********************************************************************/
+NLPIR_API unsigned long NLPIR_FingerPrint(const char *sLine);
+
+#ifdef  NLPIR_KEY_NEW_FUNC//Include keyword and new word function
+/*********************************************************************
+*
+*  Func Name  : NLPIR_GetKeyWords
+*
+*  Description: Extract keyword from sLine
+*
+*  Parameters : sLine, the input paragraph 
+*					the input size cannot be very big(less than 60MB). Process large memory, recommendate use NLPIR_NWI series functions
+*				bArguOut,whether  the keyword weight output
+				nMaxKeyLimit:maximum of key words ; -1 for unlimited
+				
+*  Returns    : keywords list like:
+*               "科学发展观 宏观经济 " or
+				"科学发展观/23.80/12#宏观经济/12.20/1" with weight(信息熵加上词频信息)
+*
+*  Author     :   
+*  History    : 
+*              1.create 2012/11/12
+*********************************************************************/
+NLPIR_API const char * NLPIR_GetKeyWords(const char *sLine,int nMaxKeyLimit=50,bool bWeightOut=false);
+
+/*********************************************************************
+*
+*  Func Name  : NLPIR_GetFileKeyWords
+*
+*  Description: Extract keyword from a text file
+*
+*  Parameters : sFilename, the input text file name 
+				bArguOut,whether  the keyword weight output
+				nMaxKeyLimit:maximum of key words, -1 for unlimited
+*  Returns    : keywords list like:
+*               "科学发展观 宏观经济 " or
+				"科学发展观 23.80 宏观经济 12.20" with weight
+
+*
+*  Author     :   
+*  History    : 
+*              1.create 2012/11/12
+*********************************************************************/
+NLPIR_API const char * NLPIR_GetFileKeyWords(const char *sFilename,int nMaxKeyLimit=50,bool bWeightOut=false);
+
+/*********************************************************************
+ *
+ *  Func Name  : NLPIR_ImportKeyBlackList
+ *
+ *  Description: Import keyword black list 
+ *  Parameters : Text filename for user dictionary, each line for a stop keyword
+ *  Returns    : The  number of  lexical entry imported successfully
+ *  Author     : Kevin Zhang
+ *  History    : 
+ *              1.create 2014-6-26
+ *********************************************************************/
+NLPIR_API unsigned int NLPIR_ImportKeyBlackList(const char *sFilename);
+
+/*********************************************************************
+*
+*  Func Name  : NLPIR_GetNewWords
+*
+*  Description: Extract New words from sLine
+*
+*  Parameters : sLine, the input paragraph; 
+*						the input size cannot be very big(less than 60MB). Process large memory, recommendate use NLPIR_NWI series functions
+*				bArguOut,whether  the keyword weight output
+*				nMaxKeyLimit:maximum of key words, up to 50
+*  Returns    : new words list like:
+*               "科学发展观 屌丝 "or
+				"科学发展观 23.80 屌丝 12.20" with weight
+*
+*  Author     :   
+*  History    : 
+*              1.create  2012/11/12
+*********************************************************************/
+NLPIR_API const char * NLPIR_GetNewWords(const char *sLine,int nMaxKeyLimit=50,bool bWeightOut=false);
+
+/*********************************************************************
+*
+*  Func Name  : NLPIR_GetFileNewWords
+*
+*  Description: Extract new words from a text file
+*
+*  Parameters : sFilename, the input text file name 
+				bArguOut,whether  the keyword weight output
+				nMaxKeyLimit:maximum of key words, up to 50
+*  Returns    : keywords list like:
+*               "科学发展观 宏观经济 " or
+				"科学发展观 23.80 宏观经济 12.20" with weight
+
+*
+*  Author     :   
+*  History    : 
+*              1.create 2012/11/12
+*********************************************************************/
+NLPIR_API const char * NLPIR_GetFileNewWords(const char *sFilename,int nMaxKeyLimit=50,bool bWeightOut=false);
+
+
+/*********************************************************************
+*
+*  以下函数为2013版本专门针对新词发现的过程，一般建议脱机实现，不宜在线处理
+*  新词识别完成后，再自动导入到分词系统中，即可完成
+*  函数以NLPIR_NWI(New Word Identification)开头
+*********************************************************************/
+/*********************************************************************
+*
+*  Func Name  : NLPIR_NWI_Start
+*
+*  Description: 启动新词识别
+
+*
+*  Parameters : None
+*  Returns    : bool, true:success, false:fail
+*
+*  Author     : Kevin Zhang
+*  History    : 
+*              1.create 2013/11/23
+*********************************************************************/
+NLPIR_API int NLPIR_NWI_Start();//New Word Indentification Start
+/*********************************************************************
+*
+*  Func Name  : NLPIR_NWI_AddFile
+*
+*  Description: 往新词识别系统中添加待识别新词的文本文件
+*				需要在运行NLPIR_NWI_Start()之后，才有效
+*
+*  Parameters : const char *sFilename：文件名
+*  Returns    : bool, true:success, false:fail
+*
+*  Author     : Kevin Zhang
+*  History    : 
+*              1.create 20132/11/23
+*********************************************************************/
+NLPIR_API unsigned long  NLPIR_NWI_AddFile(const char *sFilename);
+/*********************************************************************
+*
+*  Func Name  : NLPIR_NWI_AddMem
+*
+*  Description: 往新词识别系统中添加一段待识别新词的内存
+*				需要在运行NLPIR_NWI_Start()之后，才有效
+*
+*  Parameters : const char *sFilename：文件名
+*  Returns    : bool, true:success, false:fail
+*
+*  Author     : Kevin Zhang
+*  History    : 
+*              1.create 2013/11/23
+*********************************************************************/
+NLPIR_API unsigned long NLPIR_NWI_AddMem(const char *sText);
+/*********************************************************************
+*
+*  Func Name  : NLPIR_NWI_Complete
+*
+*  Description: 新词识别添加内容结束
+*				需要在运行NLPIR_NWI_Start()之后，才有效
+*
+*  Parameters : None
+*  Returns    : bool, true:success, false:fail
+*
+*  Author     : Kevin Zhang
+*  History    : 
+*              1.create 2013/11/23
+*********************************************************************/
+NLPIR_API int NLPIR_NWI_Complete();//文件或者内存导入结束
+
+/*********************************************************************
+*
+*  Func Name  : NLPIR_NWI_GetResult
+*
+*  Description: 获取新词识别的结果
+*				需要在运行NLPIR_NWI_Complete()之后，才有效
+*
+*  Parameters : bWeightOut：是否需要输出每个新词的权重参数
+*
+*  Returns    : 输出格式为
+*				【新词1】 【权重1】 【新词2】 【权重2】 ... 
+*
+*  Author     : Kevin Zhang
+*  History    : 
+*              1.create 2013/11/23
+*********************************************************************/
+NLPIR_API const char * NLPIR_NWI_GetResult(bool bWeightOut=false);//输出新词识别结果
+
+/*********************************************************************
+*
+*  Func Name  : NLPIR_NWI_GetKeyWordResult
+*
+*  Description: 获取关键词识别的结果
+*				需要在运行NLPIR_NWI_Complete()之后，才有效
+*
+*  Parameters : bWeightOut：是否需要输出每个新词的权重参数
+*				nMaxKeyLimit:maximum of key words, -1 for unlimited	
+*  Returns    : 输出格式为
+*				【新词1】 【权重1】 【新词2】 【权重2】 ... 
+*
+*  Author     : Kevin Zhang
+*  History    : 
+*              1.create 2015/10/13
+*********************************************************************/
+NLPIR_API const char * NLPIR_NWI_GetKeyWordResult(int nMaxKeyLimit=50,bool bWeightOut=false);
+
+/*********************************************************************
+*
+*  Func Name  : NLPIR_NWI_Result2UserDict
+*
+*  Description: 将新词识别结果导入到用户词典中
+*				需要在运行NLPIR_NWI_Complete()之后，才有效
+*				如果需要将新词结果永久保存，建议在执行NLPIR_SaveTheUsrDic
+*  Parameters : None
+*  Returns    : bool, true:success, false:fail
+*
+*  Author     : Kevin Zhang
+*  History    : 
+*              1.create 2013/11/23
+*********************************************************************/
+NLPIR_API unsigned int  NLPIR_NWI_Result2UserDict();//新词识别结果转为用户词典,返回新词结果数目
+#endif//NLPIR_INTERNAL_CALL
 #endif//#define __NLPIR_ICTCLAS_2014_H_INCLUDED__
